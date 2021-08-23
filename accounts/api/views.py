@@ -61,7 +61,9 @@ class AccountViewSet(viewsets.ViewSet):
                 "message": "username and password does not match"
             }, status=400)
         django_login(request, user)
-        return Response({"success": True})
+        return Response({"success": True,
+                         "user": UserSerializer(instance=user).data,
+                         })
 
     @action(methods=['POST'], detail=False)
     def logout(self, request):
