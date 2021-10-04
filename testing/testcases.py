@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from tweets.models import Tweet
 
 class TestCase(DjangoTestCase):
-    def create_user(self, username, email, password):
+    def create_user(self, username, email="None2343", password="123456"):
         # do not use User.objects.create() directly
         # because password need to be encrypted , username and email need to be normalized
         return User.objects.create_user(
