@@ -13,21 +13,32 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
+
 from accounts.api.views import UserViewSet, AccountViewSet
 from friendships.api.views import FriendshipViewSet
 from tweets.api.views import TweetViewSet
+from newsfeeds.api.views import NewsfeedViewSet
 
 router = routers.DefaultRouter()
 router.register(r'api/users', UserViewSet)
 router.register(r'api/accounts', AccountViewSet, basename='accounts')
 router.register(r'api/tweets', TweetViewSet, basename='tweets')
 router.register(r'api/friendships', FriendshipViewSet, basename='friendships')
+router.register(r'api/newsfeeds', NewsfeedViewSet, basename='newsfeeds')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+
+    urlpatterns.append(
+        path('__debug__', include(debug_toolbar.urls))
+    )
