@@ -5,7 +5,13 @@ from rest_framework import status
 
 from newsfeeds.services import NewsFeedService
 from tweets.models import Tweet
-from tweets.api.serializers import TweetSerializer, TweetCreateSerializer
+from tweets.api.serializers import (
+    TweetSerializer,
+    TweetCreateSerializer,
+    TweetSerializerWithComments,
+)
+from utils.decorators import required_params
+
 
 class TweetViewSet(viewsets.GenericViewSet):
     serializer_class = TweetCreateSerializer
@@ -15,18 +21,18 @@ class TweetViewSet(viewsets.GenericViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        if self.action == 'list':
+        if self.action in  ['list', 'retrieve']:
             permission_classes = [permissions.AllowAny]
         else:
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
+    @required_params(params=['user_id'])
     def list(self, request):
         """
         overload list method, do not allow request without user_id
         """
-        if 'user_id' not in request.query_params:
-            return Response('missing user_id', status=status.HTTP_400_BAD_REQUEST)
+
         user_id = self.request.query_params.get("user_id")
 
         # this query will be translated to
@@ -57,5 +63,9 @@ class TweetViewSet(viewsets.GenericViewSet):
         tweet = serializer.save()
         NewsFeedService.fanout_to_followers(tweet)
         return Response(TweetSerializer(tweet).data, status=status.HTTP_201_CREATED)
+
+    def retrieve(self, request, *args, **kwargs):
+        tweet = self.get_object()
+        return Response(TweetSerializerWithComments(tweet).data, status=status.HTTP_200_OK)
 
 

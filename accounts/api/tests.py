@@ -29,12 +29,12 @@ class AccountAPITests(TestCase):
             "username": self.user.username,
             "password": 'wrong password',
         })
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.status_code, 400)
 
         # test login status = false
         response = self.client.get(LOGIN_STATUS_URL)
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.data['login'], False)
 
         # test login successfully
@@ -42,18 +42,18 @@ class AccountAPITests(TestCase):
             "username": self.user.username,
             "password": 'correct',
         })
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertNotEqual(response.data['user'], None)
         self.assertEqual(response.data['user']['email'], 'admin@gg.com')
 
         # test login status =  true
         response = self.client.get(LOGIN_STATUS_URL)
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.data['login'], True)
 
     def test_logout(self):
-        print("-----------logout test start ------------")
+        # print("-----------logout test start ------------")
         # login
         self.client.post(LOGIN_URL, {
             "username": self.user.username,
@@ -62,29 +62,29 @@ class AccountAPITests(TestCase):
 
         # login status, True
         response = self.client.get(LOGIN_STATUS_URL)
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.data['login'], True)
 
         # test get method, return 405 = METHOD_NOT_ALLOWED
         response = self.client.get(LOGOUT_URL)
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.status_code, 405)
 
         # logout successfully return 200
         response = self.client.post(LOGOUT_URL)
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.status_code, 200)
 
         # test login status, False
         response = self.client.get(LOGIN_STATUS_URL)
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.data['login'], False)
 
-        print("-----------logout test end ------------")
+        # print("-----------logout test end ------------")
 
 
     def test_signup(self):
-        print("-----------signup test start ------------")
+        # print("-----------signup test start ------------")
 
         data = {
             'username': 'someone1',
@@ -94,7 +94,7 @@ class AccountAPITests(TestCase):
 
         # test get method failed, return 405 = METHOD_NOT_ALLOWED
         response = self.client.get(SIGNUP_URL, data)
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.status_code, 405)
 
         # test wrong format email
@@ -103,7 +103,7 @@ class AccountAPITests(TestCase):
             'email': 'wrong email',
             'password': 'any password'
         })
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.status_code, 400)
 
         # test too short password
@@ -112,7 +112,7 @@ class AccountAPITests(TestCase):
             'email': 'wrong email',
             'password': 'a'
         })
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.status_code, 400)
 
         # test too long username
@@ -121,20 +121,20 @@ class AccountAPITests(TestCase):
             'email': 'wrong email',
             'password': 'a'
         })
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.status_code, 400)
 
         # test signup successfully
         response = self.client.post(SIGNUP_URL, data)
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.status_code, 200)
 
         # test login status
         response = self.client.get(LOGIN_STATUS_URL)
-        print(response.data)
+        # print(response.data)
         self.assertEqual(response.data['login'], True)
 
-        print("-----------signup test end --------------")
+        # print("-----------signup test end --------------")
 
 
 
