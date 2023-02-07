@@ -31,6 +31,13 @@ class CommentViewSet(viewsets.GenericViewSet):
 
         return [permission() for permission in permission_classes]
 
+    # POST   /api/comments/            -> create
+    # GET    /api/comments/?tweet_id=1 -> list
+    # GET    /api/comments/1/          -> retrieve
+    # DELETE /api/comments/1/          -> destroy
+    # PATCH  /api/comments/1/          -> partial_update
+    # PUT    /api/comments/1/          -> update
+
 
     def create(self, request, *args, **kwargs):
         """
