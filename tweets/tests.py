@@ -27,7 +27,7 @@ class TweetTests(TestCase):
         self.create_like(self.user1, self.tweets1)
         self.assertEqual(len(self.tweets1.like_set), 1)
 
-        # someone else like the same tweet, the count increase
+        # someone else like the same tweet, the count + 1
         self.create_like(self.user2, self.tweets1)
         self.assertEqual(len(self.tweets1.like_set), 2)
 

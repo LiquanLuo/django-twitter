@@ -22,7 +22,7 @@ class Comment(models.Model):
         return Like.objects.filter(
             content_type = ContentType.objects.get_for_model(Comment),
             object_id = self.id,
-        ).order_by('-created_by')
+        ).order_by('-created_at')
 
     def __str__(self):
         return f'id: {self.id} ' \
