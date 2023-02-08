@@ -1,3 +1,5 @@
+from functools import wraps
+
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -7,7 +9,13 @@ def required_params(request_attr='query_params', params=None):
         params = []
 
     def decorator(view_func):
-        def _wrappered_view(instance, request, *args, **kwargs):
+        """
+        decorator use wraps to get parameter from view_func
+        and pass to  _wrapped_view
+        instance is self in view_func
+        """
+        @wraps(view_func)
+        def _wrapped_view(instance, request, *args, **kwargs):
             data = getattr(request, request_attr)
             missing_params = [
                 param
@@ -25,7 +33,7 @@ def required_params(request_attr='query_params', params=None):
                 )
 
             return view_func(instance, request, *args, **kwargs)
-        return _wrappered_view
+        return _wrapped_view
     return decorator
 
 
