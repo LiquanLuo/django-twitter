@@ -24,7 +24,9 @@ class NewsfeedViewSet(viewsets.GenericViewSet):
         """
 
         newsfeeds = Newsfeed.objects.filter(user = request.user).order_by('-created_at')
-        serializer = NewsfeedSerializer(newsfeeds, many = True)
+        serializer = NewsfeedSerializer(newsfeeds,
+                                        context={'request': request},
+                                        many = True)
 
         # normally, response has to be a hash instead of a list
         return Response({'newsfeeds': serializer.data})

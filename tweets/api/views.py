@@ -42,7 +42,10 @@ class TweetViewSet(viewsets.GenericViewSet):
         # which will use the compound index of user and created_at
         # only index user is not sufficient
         tweets = Tweet.objects.filter(user_id = user_id).order_by('-created_at')
-        serializer = TweetSerializer(tweets, many = True)
+        serializer = TweetSerializer(tweets,
+                                     context={'request': request},
+                                     many = True
+                                     )
 
         # normally, response has to be a hash instead of a list
         return Response({'tweets': serializer.data})
@@ -62,10 +65,12 @@ class TweetViewSet(viewsets.GenericViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
         tweet = serializer.save()
         NewsFeedService.fanout_to_followers(tweet)
-        return Response(TweetSerializer(tweet).data, status=status.HTTP_201_CREATED)
+        return Response(TweetSerializer(tweet, context={'request': request},).data,
+                        status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, *args, **kwargs):
         tweet = self.get_object()
-        return Response(TweetSerializerWithComments(tweet).data, status=status.HTTP_200_OK)
+        return Response(TweetSerializerWithComments(tweet, context={'request': request},).data,
+                        status=status.HTTP_200_OK)
 
 

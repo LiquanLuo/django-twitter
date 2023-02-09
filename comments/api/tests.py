@@ -11,6 +11,9 @@ from tweets.models import Tweet
 COMMENT_CREATE_API = '/api/comments/'
 COMMENT_DETAIL_API = '/api/comments/{}/'
 COMMENT_LIST_API = '/api/comments/'
+TWEET_LIST_API = '/api/tweets/'
+TWEET_DETAIL_API = '/api/tweets/{}/'
+NEWSFEED_LIST_API = '/api/newsfeeds/'
 
 
 class CommentAPITests(TestCase):
@@ -154,3 +157,23 @@ class CommentAPITests(TestCase):
         self.assertEqual(comment.created_at, before_created_at)
         self.assertNotEqual(comment.created_at, now)
         self.assertNotEqual(comment.updated_at, before_updated_at)
+
+    def test_comment_count(self):
+        # test tweet detail API
+        url = TWEET_DETAIL_API.format(self.tweet.id)
+        response = self.user1_client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['comments_count'], 0)
+
+        # test tweet list API
+        self.create_comment(self.user1, self.tweet)
+        response = self.user1_client.get(TWEET_LIST_API, {'user_id': self.user1.id})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['tweets'][0]['comments_count'], 1)
+
+        # test newsfeeds list api
+        self.create_comment(self.user2, self.tweet)
+        self.create_newsfeed(self.user2, self.tweet)
+        response = self.user2_client.get(NEWSFEED_LIST_API)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['newsfeeds'][0]['tweet']['comments_count'], 2)

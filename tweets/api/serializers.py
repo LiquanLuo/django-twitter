@@ -1,14 +1,37 @@
 from accounts.api.serializers import UserSerializer
 from rest_framework import serializers
+
+from likes.api.serializers import LikeSerializer
+from likes.services import LikeService
 from tweets.models import Tweet
 from comments.api.serializers import CommentSerializer
 
 
 class TweetSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    comments_count = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
+    has_liked = serializers.SerializerMethodField()
+
     class Meta:
         model = Tweet
-        fields = ('id', 'user', 'content', 'created_at',)
+        fields = ('id',
+                  'user',
+                  'content',
+                  'created_at',
+                  'comments_count',
+                  'likes_count',
+                  'has_liked',
+                  )
+
+    def get_comments_count(self, obj):
+        return obj.comment_set.count()
+
+    def get_likes_count(self, obj):
+        return obj.like_set.count()
+
+    def get_has_liked(self, obj):
+        return LikeService.has_liked(self.context['request'].user, obj)
 
 
 class TweetCreateSerializer(serializers.ModelSerializer):
@@ -24,9 +47,21 @@ class TweetCreateSerializer(serializers.ModelSerializer):
         tweet = Tweet.objects.create(user = user,content = content)
         return tweet
 
-class TweetSerializerWithComments(serializers.ModelSerializer):
+class TweetSerializerWithComments(TweetSerializer):
     user = UserSerializer()
     comments = CommentSerializer(source='comment_set', many=True)
+    likes = LikeSerializer(source='like_set', many=True)
+
     class Meta:
         model = Tweet
-        fields = ('id', 'user', 'comments', 'content', 'created_at',)
+        fields = ('id',
+                  'user',
+                  'comments',
+                  'content',
+                  'created_at',
+                  'likes',
+                  'comments',
+                  'likes_count',
+                  'comments_count',
+                  'has_liked',
+                  )

@@ -55,7 +55,8 @@ class CommentViewSet(viewsets.GenericViewSet):
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
         comment = serializer.save()
-        return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
+        return Response(CommentSerializer(comment, context={'request': request}).data,
+                        status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         """
@@ -72,7 +73,8 @@ class CommentViewSet(viewsets.GenericViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         comment = serializer.save()
-        return Response(CommentSerializer(comment).data, status=status.HTTP_200_OK)
+        return Response(CommentSerializer(comment, context={'request': request}).data,
+                        status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         comment = self.get_object()
@@ -88,7 +90,7 @@ class CommentViewSet(viewsets.GenericViewSet):
             self.get_queryset()
         ).order_by('created_at')
 
-        serializer = CommentSerializer(queryset, many = True)
+        serializer = CommentSerializer(queryset, context={'request': request}, many = True)
 
         # normally, response has to be a hash instead of a list
         return Response({'comments': serializer.data})
